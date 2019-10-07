@@ -1,0 +1,19 @@
+{
+  "name": "PMessage",
+  "version": "1.0.0",
+  "description": "Application for me to see messages left for me on my portfolio website",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/CHAIG200/PMessages",
+  "keywords": [
+    "Portfolio",
+    "Messages"
+  ],
+  "author": "CHAIG200",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^6.0.11"
+  }
+}
