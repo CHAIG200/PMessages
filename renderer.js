@@ -1,49 +1,58 @@
 var request = require("request");
 const fs = require('fs');
 
+process.on('exit', () => {
+  
+    fs.writeFile("./info.json", JSON.stringify({ "messages" : 0 }), function (err) {
+        if (err) return console.log(err);
+        console.log('The file has been saved!');
+        setTimeout((function(){
+            process.exit();
+        }),200);
+        
+      });
+      console.log('Process exit event with code: ', code);
+  });
+
 module.exports = {
 
     getMessages : function(){
-        
-            var latestJSON = getLatest(function(data){
-                return (data)
-            }());
-            console.log("count" + latestJSON)
-            var options = { method: 'GET',
-            url: 'http://chrishaig.me/api/portfolio/list.php',
-            qs: { verify: '' },
-            headers: 
-             { 'cache-control': 'no-cache',
-               Connection: 'keep-alive',
-               'accept-encoding': 'gzip, deflate',
-               Host: 'chrishaig.me',
-               'Cache-Control': 'no-cache',
-               Accept: '*/*'} };
-          
-          request(options, function (error, response, body) {
-            if (error) throw new Error(error);
-          
-            var json = JSON.parse(body);
-            latest = Object.keys(json).length;
-            json.forEach(element => {
-               if(Object.keys(json).length > latestJSON){
-                   addMessage(element.name,element.subject,element.priority,element.message)
-                   latest = element.id;
-               }
-                
-            });
+            
+            getLatest(function(result) {
+                var latestJSON =  parseInt(result,10);
+                console.log("count: " + latestJSON)
 
-            if(Object.keys(json).length != latestJSON){
+                var options = { method: 'GET',
+                url: 'http://chrishaig.me/api/portfolio/list.php',
+                qs: { verify: '' },
+                headers: { 'cache-control': 'no-cache',Connection: 'keep-alive','accept-encoding': 'gzip, deflate',Host: 'chrishaig.me','Cache-Control': 'no-cache',Accept: '*/*'} };
+              
+                request(options, function (error, response, body) {
+                    if (error) throw new Error(error);
                 
-                fs.writeFile("info.json", JSON.stringify({ "messages" : Object.keys(json).length }), function (err) {
-                    if (err) return console.log(err);
-                    console.log('The file has been saved!');
-                  });
-            }
-          
-          });
-          
-       console.log("running")
+                    //Loops through all of the messages and if the message is already displayed then it will not be displayed again.
+                    var json = JSON.parse(body);
+                    latest = Object.keys(json).length;
+                    json.forEach(element => {
+                    if(Object.keys(json).length > latestJSON){
+                        addMessage(element.name,element.subject,element.priority,element.message)
+                        latest = element.id;
+                    }
+                        
+                });
+                
+                //Updates the json file with the latests message id to prevent adding the same messages again 
+                if(Object.keys(json).length != latestJSON){
+                    
+                    fs.writeFile("./info.json", JSON.stringify({ "messages" : Object.keys(json).length }), function (err) {
+                        if (err) return console.log(err);
+                        console.log('The file has been saved!');
+                      });
+                }
+              
+              });
+    
+            });
 
     }
 }
@@ -87,7 +96,9 @@ function addMessage(name, email, priority, message){
         }
         console.log("read: " + jsonString)
         var json = JSON.parse(jsonString);
-       return callback(json.messages);
+        var nums = json.messages;
+        callback(nums);
+      
     });
   }
 
