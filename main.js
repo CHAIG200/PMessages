@@ -2,6 +2,28 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const notifier = require('node-notifier');
+const fs = require('fs');
+
+fs.readFile('./info.json', 'utf8', (err, jsonString) => {
+  if (err) {
+      console.log("File read failed:", err)
+      return
+  }
+  console.log("read: " + jsonString)
+  var json = JSON.parse(jsonString);
+  json.messages = 0;
+
+  fs.writeFile("./info.json", JSON.stringify(json), function (err) {
+    if (err) return console.log(err);
+    console.log('The file has been saved!');
+    setTimeout((function(){
+
+    }),200);
+    
+  });
+
+});
+
 
 let mainWindow
 
@@ -29,19 +51,6 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
-
-  notifier.notify(
-    {
-      title: 'Message Alert',
-      message: 'New Message from [name]',
-      icon: path.join(__dirname, 'coulson.jpg'), // Absolute path (doesn't work on balloons)
-      sound: false, // Only Notification Center or Windows Toasters
-      wait: true // Wait with callback, until user action is taken against notification, does not apply to Windows Toasters as they always wait
-    },
-    function(err, response) {
-      // Response is response from notification
-    }
-  );
   
 }
 

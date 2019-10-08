@@ -61,10 +61,9 @@ html, body {
 .tabcontent {
   float: left;
   padding: 0px 12px;
-  border: 1px solid #fbbe28;
   width: 70%;
   border-left: none;
-  height: 300px;
+  height: 100vh;
 }
 
 h3,p{

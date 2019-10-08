@@ -1,18 +1,8 @@
 var request = require("request");
 const fs = require('fs');
-
-process.on('exit', () => {
-  
-    fs.writeFile("./info.json", JSON.stringify({ "messages" : 0 }), function (err) {
-        if (err) return console.log(err);
-        console.log('The file has been saved!');
-        setTimeout((function(){
-            process.exit();
-        }),200);
-        
-      });
-      console.log('Process exit event with code: ', code);
-  });
+var last = 0;
+var notify = false;
+const notifier = require('node-notifier');
 
 module.exports = {
 
@@ -20,8 +10,8 @@ module.exports = {
             
             getLatest(function(result) {
                 var latestJSON =  parseInt(result,10);
-                console.log("count: " + latestJSON)
-
+                console.log("Last = " + last)
+                console.log("latestJSON = " + latestJSON)
                 var options = { method: 'GET',
                 url: 'http://chrishaig.me/api/portfolio/list.php',
                 qs: { verify: '' },
@@ -32,11 +22,26 @@ module.exports = {
                 
                     //Loops through all of the messages and if the message is already displayed then it will not be displayed again.
                     var json = JSON.parse(body);
-                    latest = Object.keys(json).length;
                     json.forEach(element => {
-                    if(Object.keys(json).length > latestJSON){
+                    if(element.id > latestJSON){
                         addMessage(element.name,element.subject,element.priority,element.message)
-                        latest = element.id;
+                        if(last == latestJSON ){
+                            if(notify == true){
+                                notifier.notify(
+                                    {
+                                      title: 'Message Alert',
+                                      message: 'You have a new message from '+ element.name ,
+                                      sound: false,
+                                      wait: true 
+                                    }, function(err, response) {
+                                      
+                                    }
+                                  );
+                            }
+
+                              notify = true;
+                        }
+                        last = element.id;
                     }
                         
                 });
